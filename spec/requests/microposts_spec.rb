@@ -3,10 +3,10 @@ require 'spec_helper'
 describe "Microposts" do
 
   before(:each) do
-    user = Factory(:user)
+    @user = Factory(:user)
     visit signin_path
-    fill_in :email,    :with => user.email
-    fill_in :password, :with => user.password
+    fill_in :email,    :with => @user.email
+    fill_in :password, :with => @user.password
     click_button
   end
 
@@ -35,6 +35,27 @@ describe "Microposts" do
           click_button
           response.should have_selector("span.content", :content => content)
         end.should change(Micropost, :count).by(1)
+      end
+    end
+  end
+
+  describe "sidebar" do
+
+    describe "number of microposts" do
+
+      it "should be 1" do
+        Factory(:micropost, :user => @user)
+        visit root_path
+        response.should have_selector("span.microposts", 
+                                      :content => "1 micropost")
+      end
+
+      it "should be 2" do
+        Factory(:micropost, :user => @user)
+        Factory(:micropost, :user => @user)
+        visit root_path
+        response.should have_selector("span.microposts", 
+                                      :content => "2 microposts")
       end
     end
   end
